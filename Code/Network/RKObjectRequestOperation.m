@@ -270,6 +270,19 @@ static NSString *RKStringDescribingURLResponseWithData(NSURLResponse *response, 
     return responseMappingQueue;
 }
 
++ (NSOperationQueue *)utilResponseMappingQueue
+{
+	static NSOperationQueue *utilResponseMappingQueue = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		utilResponseMappingQueue = [NSOperationQueue new];
+		[utilResponseMappingQueue setName:@"RKObjectRequestOperation Util Response Mapping Queue" ];
+		[utilResponseMappingQueue setMaxConcurrentOperationCount:1];
+	});
+	
+	return utilResponseMappingQueue;
+}
+
 + (dispatch_queue_t)dispatchQueue
 {
     static dispatch_queue_t dispatchQueue;
@@ -463,8 +476,12 @@ static NSString *RKStringDescribingURLResponseWithData(NSURLResponse *response, 
     [self.responseMapperOperation setWillMapDeserializedResponseBlock:self.willMapDeserializedResponseBlock];
     [self.responseMapperOperation setDidFinishMappingBlock:^(RKMappingResult *mappingResult, NSError *error) {
         completionBlock(mappingResult, error);
-    }];
-    [[RKObjectRequestOperation responseMappingQueue] addOperation:self.responseMapperOperation];
+    }];	
+	if (self.isUtilityOperation) {
+		[[RKObjectRequestOperation utilResponseMappingQueue] addOperation:self.responseMapperOperation];
+	} else {
+		[[RKObjectRequestOperation responseMappingQueue] addOperation:self.responseMapperOperation];
+	}
 }
 
 - (void)execute

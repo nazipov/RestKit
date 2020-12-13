@@ -211,6 +211,11 @@ extern NSString * const RKResponseHasBeenMappedCacheUserInfoKey;
  */
 + (NSOperationQueue *)responseMappingQueue;
 
+
++ (NSOperationQueue *)utilResponseMappingQueue;
+
+@property (nonatomic, assign) BOOL isUtilityOperation;
+
 @end
 
 ///--------------------

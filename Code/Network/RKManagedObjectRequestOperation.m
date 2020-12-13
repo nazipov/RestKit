@@ -672,7 +672,12 @@ BOOL RKDoesArrayOfResponseDescriptorsContainOnlyEntityMappings(NSArray *response
         }
         completionBlock(nil, responseMappingError);
     }];
-    [[RKObjectRequestOperation responseMappingQueue] addOperation:self.responseMapperOperation];
+	
+	if (self.isUtilityOperation) {
+		[[RKObjectRequestOperation utilResponseMappingQueue] addOperation:self.responseMapperOperation];
+	} else {
+		[[RKObjectRequestOperation responseMappingQueue] addOperation:self.responseMapperOperation];
+	}
 }
 
 - (BOOL)deleteTargetObject:(NSError * __autoreleasing *)error
